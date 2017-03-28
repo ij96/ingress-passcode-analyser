@@ -8,6 +8,7 @@ using namespace std;
 #include "format_check.h"
 
 void analyse();
+void usual_routine(string ciphertext);
 void show_help();
 
 int main(int argc, char** argv){
@@ -26,35 +27,55 @@ int main(int argc, char** argv){
 void analyse(){
 	string code;
 	cout<<"\n\n********** Ingress passcode analyser **********\n\n";
-	cout<<"Enter code:\n";
+	cout<<"Enter code: ";
 	cin>>code;
+	cout<<"\n\nLength = "<<code.size()<<", ";
 	int format_case = format_check(code);
-	cout<<'\n';
 	switch(format_case){
 		case 1:
-			cout<<"Investigate Blog format\n";
-			break;
-		case 2:
-			cout<<"Ingress Report format\n";
-			break;
-		case 3:
-			cout<<"Anomaly format\n";
-			break;
-		case 4:
-			cout<<"All letters\n";
+			cout<<"all letters\n";
 			cout<<"Try look for two letter written digits.\n";
 			cout<<"Replace two letter written digits:\n\t"<<replace_two_letter_digit(code)<<'\n';
 			break;
+		case 10:
+			cout<<"Investigate Blog format\n";
+			usual_routine(code);
+			break;
 		case 11:
-			cout<<"Fits the Investigate Blog format but with 0 and/or 1.\n";
-			cout<<"Try alphanumeric Atbash or ROT.\n";			
-			cout<<"Alphanumberic Atbash:\n\t"<<atbash_alphanum(code)<<'\n';
-			cout<<"Alphanumberic ROT 13:\n\t"<<ROT_alphanum(13, code)<<'\n';
+			cout<<"Investigate Blog format reversed.\n";
+			cout<<"Try reversing first.\n";
+			code = reverse(code);
+			cout<<"Reverse:\n\t"<<code<<"\n\n";
+			usual_routine(code);
+			break;
+		case 12:
+			cout<<"fits the Investigate Blog format but has 0 and/or 1.\n";
+			cout<<"Try alphanumeric Atbash or ROT.\n";
+			usual_routine(code);
+			break;
+		case 20:
+			cout<<"Ingress Report format\n";
+			break;
+		case 21:
+			cout<<"Investigate Report format reversed.\n";
+			cout<<"Try reversing first.\n";
+			code = reverse(code);
+			cout<<"Reverse:\n\t"<<code<<"\n\n";
+			usual_routine(code);
+			break;
+		case 30:
+			cout<<"Anomaly format\n";
 			break;
 		default:
-			cout<<"Does not match any recent patterns (could be WOTD or Old format).";
+			cout<<"does not match any recent patterns (could be WOTD or Old format).";
 			break;
 	}
+}
+
+void usual_routine(string ciphertext){
+	cout<<"\nGoing through the usual rountine:\n\n";
+	cout<<"Alphanumberic Atbash:\n\t"<<atbash_alphanum(ciphertext)<<"\n\n";
+	cout<<"Alphanumberic ROT 13:\n\t"<<ROT_alphanum(13, ciphertext)<<"\n\n";
 }
 
 void show_help(){

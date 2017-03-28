@@ -1,5 +1,34 @@
 #include "decoders.h"
 
+string reverse(string ciphertext){
+	string plaintext = "";
+	int len = ciphertext.size();
+	for(int i = 0; i < len; i++){
+		plaintext += ciphertext[len-i];
+	}
+	return plaintext;
+}
+
+string atbash(string ciphertext){
+	//plaintext:  a-zA-Z
+	//ciphertext: z-aZ-A
+	for(int i = 0; i < ciphertext.size(); i++){
+		int ascii_val = int(ciphertext[i]);
+		char converted_char = 0;
+		switch(ascii_val){
+			case 65 ... 90:		//A-Z
+				converted_char = 155 - ascii_val;
+				ciphertext[i] = converted_char;
+				break;
+			case 97 ... 122:	//a-z
+				converted_char = 219 - ascii_val;
+				ciphertext[i] = converted_char;
+				break;
+		}
+	}
+	return ciphertext;
+}
+
 string atbash_alphanum(string ciphertext){
 	//plaintext:  a-zA-Z1-9
 	//ciphertext: z-aZ-A9-1
@@ -45,13 +74,20 @@ string ROT(int n, string ciphertext){
 
 string ROT_alphanum(int n, string ciphertext){
 	n = n % 26;
-	ciphertext = ROT(n,ciphertext);
 	for(int i = 0; i < ciphertext.size(); i++){
 		int ascii_val = int(ciphertext[i]);
 		char converted_char = 0;
 		switch(ascii_val){
 			case 48 ... 57:		//0-9
 				converted_char = (ascii_val - 48 + n) % 10 + 48;
+				ciphertext[i] = converted_char;
+				break;
+			case 65 ... 90:		//A-Z
+				converted_char = (ascii_val - 65 + n) % 26 + 65;
+				ciphertext[i] = converted_char;
+				break;
+			case 97 ... 122:	//a-z
+				converted_char = (ascii_val - 97 + n) % 26 + 97;
 				ciphertext[i] = converted_char;
 				break;
 		}
@@ -70,4 +106,16 @@ string replace_two_letter_digit(string ciphertext){
 		}
 	}
 	return ciphertext;
+}
+
+vector<int> factors(string ciphertext){
+	vector<int> result;
+	int len = ciphertext.size();
+	int square_root = (int)sqrt(len)+1;
+	for(int i = 2; i < len; i++){
+		if(len % i == 0){
+			result.push_back(i);
+			if(len/i != i) result.push_back(len/i);
+		}
+	}
 }

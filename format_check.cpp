@@ -1,11 +1,16 @@
 #include "format_check.h"
 
 int format_check(string code){
-	if(pattern_match(code, "xxx##k###xx"))	return 1;	// Investigate Blog
-	if(pattern_match(code, "k@xx@@xx@"))	return 2;	// Ingress Report
-	if(pattern_match(code, "xxxxxxxx#k#"))	return 3;	// Anomaly
-	if(pattern_match(code, "k"))			return 4;	// all text
-	if(pattern_match(code, "xxx@@k@@@xx"))	return 11;	// Investigate Blog with 0 and/or 1
+	if(pattern_match(code, "xxx##k###xx"))	return 10;	// Investigate Blog
+	if(pattern_match(code, "xx###k##xxx"))	return 11;	// reversed
+	if(pattern_match(code, "xxx@@k@@@xx"))	return 12;	// has 0 and/or 1
+	
+	if(pattern_match(code, "k@xx@@xx@"))	return 20;	// Ingress Report
+	if(pattern_match(code, "@xx@@xx@k"))	return 21;	// reversed
+	
+	if(pattern_match(code, "xxxxxxxx#k#"))	return 30;	// Anomaly
+	
+	if(pattern_match(code, "k"))			return 1;	// all text
 	return 0;
 }
 
