@@ -7,13 +7,18 @@ using namespace std;
 #include "decoders.h"
 #include "format_check.h"
 
-void analyse();
-void usual_routine(string ciphertext);
+void analyse(string& code);
+void action(string code);
 void show_help();
 
 int main(int argc, char** argv){
 	if(argc == 1){
-		analyse();
+		string code;
+		cout<<"\n\n********** Ingress passcode analyser **********\n\n";
+		cout<<"Enter code\n>> ";
+		cin>>code;
+		analyse(code);
+		action(code);
 	}
 	else if(argc == 2){
 		string arg = argv[1];
@@ -24,62 +29,102 @@ int main(int argc, char** argv){
 	return 0;
 }
 
-void analyse(){
-	string code;
-	cout<<"\n\n********** Ingress passcode analyser **********\n\n";
-	cout<<"Enter code: ";
-	cin>>code;
-	cout<<"\n\nLength = "<<code.size()<<", ";
-	int format_case = format_check(code);
-	switch(format_case){
-		case 1:
-			cout<<"all letters\n";
-			cout<<"Try look for two letter written digits.\n";
-			cout<<"Replace two letter written digits:\n\t"<<replace_two_letter_digit(code)<<'\n';
-			break;
-		case 10:
-			cout<<"Investigate Blog format\n";
-			usual_routine(code);
-			break;
-		case 11:
-			cout<<"Investigate Blog format reversed.\n";
-			cout<<"Try reversing first.\n";
-			code = reverse(code);
-			cout<<"Reverse:\n\t"<<code<<"\n\n";
-			usual_routine(code);
-			break;
-		case 12:
-			cout<<"fits the Investigate Blog format but has 0 and/or 1.\n";
-			cout<<"Try alphanumeric Atbash or ROT.\n";
-			usual_routine(code);
-			break;
-		case 20:
-			cout<<"Ingress Report format\n";
-			break;
-		case 21:
-			cout<<"Investigate Report format reversed.\n";
-			cout<<"Try reversing first.\n";
-			code = reverse(code);
-			cout<<"Reverse:\n\t"<<code<<"\n\n";
-			usual_routine(code);
-			break;
-		case 30:
-			cout<<"Anomaly format\n";
-			break;
-		default:
-			cout<<"does not match any recent patterns (could be WOTD or Old format).";
-			break;
+void action(string code){
+	const string original_code = code;
+	char act = ' ';
+	int shift = 0;
+	while(act!='e'){
+		cout<<">> "; cin>>act;
+		switch(act){
+			case 'a':
+				code = atbash_alphanum(code);
+				cout<<"Alphanumberic Atbash:\n\t"<<code;
+				break;
+			case 'b':
+				try{
+					code = base64(code);
+					cout<<"Base64:\n\t"<<code;
+				}
+				catch(const invalid_argument& e){
+					cout<<e.what();
+				}
+				break;
+			case 'h':
+				code = atbash_hex(code);
+				cout<<"Hex Atbash:\n\t"<<code;
+				break;
+			case 'r':
+				code = reverse(code);
+				cout<<"Reverse:\n\t"<<code;
+				break;
+			case 't':
+				cin>>shift;
+				code = ROT_alphanum(shift, code);
+				cout<<"Alphanumberic ROT"<<shift<<":\n\t"<<code;
+				break;
+			case 'o':
+				cout<<"Original code:\n\t"<<original_code;
+				break;
+			case 'O':
+				code = original_code;
+				cout<<"Reset code:\n\t"<<code;
+				break;
+			case 'l':
+				code = replace_two_letter_digit(code);
+				cout<<"Replace two-letter written digits:\n\t"<<code;
+				break;
+			case 's':
+				cin>>shift;
+				code = skip(shift, code);
+				cout<<"Skip "<<shift<<":\n\t"<<code;
+				break;
+			case 'e':	// exit
+				cout<<"Exit";
+				return;
+		}
+		cout<<"\n\n";
 	}
 }
 
-void usual_routine(string ciphertext){
-	cout<<"\nGoing through the usual rountine:\n\n";
-	cout<<"Alphanumberic Atbash:\n\t"<<atbash_alphanum(ciphertext)<<"\n\n";
-	cout<<"Alphanumberic ROT 13:\n\t"<<ROT_alphanum(13, ciphertext)<<"\n\n";
+void analyse(string& code){
+	cout<<"\nLength = "<<code.size()<<", ";
+	int format_case = format_check(code);
+	string format_name = "", tips = "";
+	switch(format_case){
+		case 1:
+			format_name = "all letters";
+			tips = "Try looking for two-letter written digits.";
+			break;
+		case 10:
+			format_name = "Investigate Blog format";
+			break;
+		case 11:
+			format_name = "Investigate Blog format reversed.";
+			tips = "Try reversing first.";
+			break;
+		case 12:
+			format_name = "fits the Investigate Blog format but has 0 and/or 1.";
+			tips = "Try alphanumeric Atbash or ROT.";
+			break;
+		case 20:
+			format_name = "Ingress Report format";
+			break;
+		case 21:
+			format_name = "Investigate Report format reversed.";
+			tips = "Try reversing first.";
+			break;
+		case 30:
+			format_name = "Anomaly format";
+			break;
+		default:
+			format_name = "does not match any recent patterns (could be WOTD or Old format).";
+			break;
+	}
+	cout<<format_name<<'\n'<<tips<<'\n';
 }
 
 void show_help(){
-	string code_format = "\nPasscode formats: (from ingress.codes)\n\n";
+	string code_format = "\nPasscode formats (from ingress.codes)\n\n:";
 	
 	code_format += "Investigation Blog:\n";
 	code_format += "xxx##keyword###xx\n";
@@ -104,4 +149,19 @@ void show_help(){
 	code_format += "[not supported]\n\n";
 	
 	cout<<code_format;
+	
+	string commands = "\nCommands: \n\n";
+	
+	commands += "a\t| Atbash (alphanumeric)\n";
+	commands += "h\t| Atbash (hex)\n";
+	commands += "t[num]\t| ROT[num] (alphanumeric)\n";
+	commands += "l\t| replace two-letter written digits\n";
+	commands += "s[num]\t| skip [num]\n";
+	commands += "b\t| Base64\n";
+	
+	commands += "o\t| view original code\n";
+	commands += "O\t| reset current code to the original\n";
+	commands += "e\t| exit\n";
+	
+	cout<<commands;
 }

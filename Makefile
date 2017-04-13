@@ -1,15 +1,15 @@
-SRC		= main.cpp format_check.cpp decoders.cpp
-TARGET	= analyser
-OBJS	= $(subst .cpp,.o,$(SRC))
+SRC		:= main.cpp format_check.cpp decoders.cpp
+TARGET	:= analyser
+OBJS	:= $(subst .cpp,.o,$(SRC))
 
-CC		= g++
-CFLAGS	= -g -I.
-LDFLAGS	= -g
+CC		:= g++
+CFLAGS	:= -g -I.
+LDFLAGS	:= -g
 
 ifeq ($(OS),Windows_NT)
-	RM	= del /Q /F
+	RM	:= del /Q /F
 else
-    RM	= rm -f
+    RM	:= rm -f
 endif
 
 .PHONY: all
