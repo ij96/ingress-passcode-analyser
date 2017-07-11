@@ -1,6 +1,7 @@
 // Ingress passcode analyser
 
 #include <iostream>
+#include <fstream>
 #include <string>
 using namespace std;
 
@@ -22,7 +23,7 @@ int main(int argc, char** argv){
 	}
 	else if(argc == 2){
 		string arg = argv[1];
-		if(arg == "-help"){
+		if(arg == "--help" or arg == "-h"){
 			show_help();
 		}
 	}
@@ -31,10 +32,12 @@ int main(int argc, char** argv){
 
 void action(string code){
 	const string original_code = code;
+	string act_buff = "";
 	char act = ' ';
 	int shift = 0;
 	while(act!='e'){
-		cout<<">> "; cin>>act;
+		cout<<">> "; cin>>act_buff;
+		act = act_buff[0];
 		switch(act){
 			case 'a':
 				code = atbash_alphanum(code);
@@ -79,7 +82,7 @@ void action(string code){
 				cout<<"Skip "<<shift<<":\n\t"<<code;
 				break;
 			case 'e':	// exit
-				cout<<"Exit";
+				cout<<"Exit\n";
 				return;
 		}
 		cout<<"\n\n";
@@ -116,52 +119,28 @@ void analyse(string& code){
 		case 30:
 			format_name = "Anomaly format";
 			break;
+		case 40:
+			format_name = "WOTD format";
+			break;
+		case 50:
+			format_name = "Old format";
+			break;
 		default:
-			format_name = "does not match any recent patterns (could be WOTD or Old format).";
+			format_name = "does not match any known patterns";
 			break;
 	}
 	cout<<format_name<<'\n'<<tips<<'\n';
 }
 
 void show_help(){
-	string code_format = "\nPasscode formats (from ingress.codes)\n\n:";
-	
-	code_format += "Investigation Blog:\n";
-	code_format += "xxx##keyword###xx\n";
-	code_format += "(# are 2 to 9)\n\n";
-	
-	code_format += "WOTD:\n";
-	code_format += "x#x#keywordx#xx\n";
-	code_format += "(# are 0 to 9)\n";
-	code_format += "[not supported]\n\n";
-	
-	code_format += "Ingress Report (forever code):\n";
-	code_format += "keyword#xx##xx#\n";
-	code_format += "(# are 0 to 9)\n\n";
-	
-	code_format += "Anomaly:\n";
-	code_format += "xxxxxxxx#keyword#\n";
-	code_format += "(# are 2 to 9)\n\n";
-	
-	code_format += "Old formats:\n";
-	code_format += "#xxx#keywordx#x#x\n";
-	code_format += "(# are 2 to 9)\n";
-	code_format += "[not supported]\n\n";
-	
-	cout<<code_format;
-	
-	string commands = "\nCommands: \n\n";
-	
-	commands += "a\t| Atbash (alphanumeric)\n";
-	commands += "h\t| Atbash (hex)\n";
-	commands += "t[num]\t| ROT[num] (alphanumeric)\n";
-	commands += "l\t| replace two-letter written digits\n";
-	commands += "s[num]\t| skip [num]\n";
-	commands += "b\t| Base64\n";
-	
-	commands += "o\t| view original code\n";
-	commands += "O\t| reset current code to the original\n";
-	commands += "e\t| exit\n";
-	
-	cout<<commands;
+	ifstream help_file("./help.txt");
+	string line = "";
+	if(!help_file.is_open()){
+		cout<<"cannot find help.txt!"<<'\n';
+		return;
+	}
+	while(getline(help_file,line)){
+		cout<<line<<'\n';
+	}
+	help_file.close();
 }

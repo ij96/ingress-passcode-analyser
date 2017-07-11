@@ -10,6 +10,10 @@ int format_check(string code){
 	
 	if(pattern_match(code, "xxxxxxxx#k#"))	return 30;	// Anomaly
 	
+	if(pattern_match(code, "x@x@k@xx"))		return 40;	// WOTD
+	
+	if(pattern_match(code, "#xxx#k#x#x"))	return 50;	// Old format
+	
 	if(pattern_match(code, "k"))			return 1;	// all text
 	return 0;
 }

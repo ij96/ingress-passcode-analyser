@@ -6,6 +6,7 @@ CC		:= g++
 CFLAGS	:= -g -I.
 LDFLAGS	:= -g
 
+# check if using Windows
 ifeq ($(OS),Windows_NT)
 	RM	:= del /Q /F
 else
